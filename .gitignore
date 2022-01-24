@@ -36,3 +36,5 @@ sysinfo.txt
 *.apk
 *.unitypackage
 Assets/PlayFabEditorExtensions/Editor/Resources/PlayFabEditorPrefsSO.asset
+
+Logs/

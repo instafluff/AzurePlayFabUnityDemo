@@ -107,7 +107,7 @@ namespace Unity.FPS.AI
         int m_PathDestinationNodeIndex;
         EnemyManager m_EnemyManager;
         ActorsManager m_ActorsManager;
-        Health m_Health;
+        public Health m_Health;
         Actor m_Actor;
         Collider[] m_SelfColliders;
         GameFlowManager m_GameFlowManager;
