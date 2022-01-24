@@ -10,7 +10,7 @@ using Unity.Networking.Transport;
 public class Server : MonoBehaviour
 {
     private List<ConnectedPlayer> players;
-    public bool RunLocal = false;
+    public bool RunLocal;
 
     public NetworkDriver networkDriver;
     private NativeList<NetworkConnection> connections;
@@ -178,14 +178,6 @@ public class Server : MonoBehaviour
 							}
 						}
                     }
-
-                    networkDriver.BeginSend( NetworkPipeline.Null, connections[ i ], out var writer );
-                    writer.WriteUInt( numEnemies );
-                    for( int b = 0; b < numEnemies; b++ )
-                    {
-                        writer.WriteByte( enemyStatus[ b ] );
-                    }
-                    networkDriver.EndSend( writer );
                 }
                 else if( cmd == NetworkEvent.Type.Disconnect )
                 {
@@ -199,6 +191,15 @@ public class Server : MonoBehaviour
                     }
                 }
             }
+
+            // Broadcast Game State
+            networkDriver.BeginSend( NetworkPipeline.Null, connections[ i ], out var writer );
+            writer.WriteUInt( numEnemies );
+            for( int b = 0; b < numEnemies; b++ )
+            {
+                writer.WriteByte( enemyStatus[ b ] );
+            }
+            networkDriver.EndSend( writer );
         }
 
 		//Debug.Log( Time.realtimeSinceStartup );
