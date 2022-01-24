@@ -4,10 +4,11 @@ using Unity.FPS.AI;
 using PlayFab.MultiplayerModels;
 using System.Collections.Generic;
 using PlayFab;
+using System;
 
 public class Client : MonoBehaviour
 {
-    public bool RunLocal = false;
+    public bool RunLocal;
     private NetworkDriver networkDriver;
     private NetworkConnection networkConnection;
     private bool isDone;
@@ -17,6 +18,8 @@ public class Client : MonoBehaviour
     private bool startedConnectionRequest = false;
     private bool isConnected = false;
 
+
+    // FOR MULTIPLAYER SERVER ONLY
     private void RequestMultiplayerServer()
     {
         RequestMultiplayerServerRequest requestData = new RequestMultiplayerServerRequest();
@@ -36,7 +39,10 @@ public class Client : MonoBehaviour
         Debug.Log( error.ErrorMessage );
     }
 
-	private void connectToServer( string address, ushort port )
+    static public string matchAddress = "";
+    static public ushort matchPort = 0;
+
+    private void connectToServer( string address, ushort port )
 	{
         Debug.Log( "Connecting to " + address + ":" + port );
         networkDriver = NetworkDriver.Create();
@@ -49,6 +55,8 @@ public class Client : MonoBehaviour
         enemyManager = FindObjectOfType<EnemyManager>();
         enemies = GameObject.FindGameObjectsWithTag( "Enemy" );
         Debug.Log( "Detected " + enemies.Length + " enemies" );
+        // Sort the array by name to keep it consistent across clients
+        Array.Sort( enemies, ( e1, e2 ) => e1.name.CompareTo( e2.name ) );
 
         int length = enemies.Length;
         enemyStatus = new byte[ length ];
@@ -70,7 +78,8 @@ public class Client : MonoBehaviour
 		}
         else
 		{
-            RequestMultiplayerServer();
+            //RequestMultiplayerServer(); // MULTIPLAYER-SERVER-ONLY
+            connectToServer( matchAddress, matchPort );
         }
 	}
 
@@ -126,7 +135,7 @@ public class Client : MonoBehaviour
                             // Find the right enemy and "kill" it for the animation
                             foreach( var en in enemyManager.Enemies )
 							{
-                                if( en.gameObject == enemies[ b ] )
+                                if( en.name == enemies[ b ].name )
 								{
                                     en.m_Health.Kill();
                                     break;
