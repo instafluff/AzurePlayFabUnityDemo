@@ -5,6 +5,7 @@ using PlayFab.MultiplayerModels;
 using System.Collections.Generic;
 using PlayFab;
 using System;
+using PlayFab.ClientModels;
 
 public class Client : MonoBehaviour
 {
@@ -67,6 +68,27 @@ public class Client : MonoBehaviour
                 enemyStatus[ i ] = (byte)( enemies[ i ].activeSelf ? 1 : 0 );
             }
         }
+    }
+
+    // FOR LEADERBOARD
+    private void ReportStatBotDestroyed()
+	{
+        UpdatePlayerStatisticsRequest requestData = new UpdatePlayerStatisticsRequest() {
+            Statistics = new List<StatisticUpdate>() {
+                new StatisticUpdate() { StatisticName = "Bots Destroyed", Value = 1 }
+            }
+        };
+        PlayFabClientAPI.UpdatePlayerStatistics( requestData, OnReportStatBotDestroyedResult, OnReportStatBotDestroyedError );
+    }
+
+    private void OnReportStatBotDestroyedResult( UpdatePlayerStatisticsResult response )
+	{
+        // Successfully Reported
+	}
+
+    private void OnReportStatBotDestroyedError( PlayFabError error )
+    {
+        Debug.Log( error.ErrorMessage );
     }
 
 	void Start()
@@ -164,6 +186,7 @@ public class Client : MonoBehaviour
                 ( enemies[ i ] == null || !enemies[ i ].activeSelf ) )
             {
                 enemyStatus[ i ] = 0;
+                ReportStatBotDestroyed();
             }
         }
 
