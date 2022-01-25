@@ -26,52 +26,7 @@ public class Server : MonoBehaviour
 
     private void OnServerActive()
     {
-        Debug.Log( "Starting Server" );
-
-        // Start transport server
-        networkDriver = NetworkDriver.Create();
-        var endpoint = NetworkEndPoint.AnyIpv4;
-        endpoint.Port = 7777;
-        var connectionInfo = PlayFabMultiplayerAgentAPI.GetGameServerConnectionInfo();
-        if( connectionInfo != null )
-		{
-            // Set the server to the first available port
-            foreach( var port in connectionInfo.GamePortsConfiguration )
-			{
-                endpoint.Port = (ushort)port.ServerListeningPort;
-                break;
-			}
-        }
-        if( networkDriver.Bind( endpoint ) != 0 )
-        {
-            Debug.Log( "Failed to bind to port " + endpoint.Port );
-        }
-        else
-        {
-            networkDriver.Listen();
-        }
-
-        connections = new NativeList<NetworkConnection>( 16, Allocator.Persistent );
-
-        enemyStatus = new byte[ numEnemies ];
-        for( int i = 0; i < numEnemies; i++ )
-        {
-            enemyStatus[ i ] = 1;
-        }
-        Debug.Log("Server Started From Agent Activation");
-    }
-
-    private void OnPlayerRemoved(string playfabId)
-    {
-        ConnectedPlayer player = players.Find(x => x.PlayerId.Equals(playfabId, StringComparison.OrdinalIgnoreCase));
-        players.Remove(player);
-        PlayFabMultiplayerAgentAPI.UpdateConnectedPlayers(players);
-    }
-
-    private void OnPlayerAdded(string playfabId)
-    {
-        players.Add(new ConnectedPlayer(playfabId));
-        PlayFabMultiplayerAgentAPI.UpdateConnectedPlayers(players);
+        StartServer();
     }
 
     private void OnAgentError(string error)
@@ -110,12 +65,48 @@ public class Server : MonoBehaviour
         StartCoroutine( ReadyForPlayers() );
     }
 
-    // Start is called before the first frame update
+    void StartServer()
+	{
+        Debug.Log( "Starting Server" );
+
+        // Start transport server
+        networkDriver = NetworkDriver.Create();
+        var endpoint = NetworkEndPoint.AnyIpv4;
+        endpoint.Port = 7777;
+        var connectionInfo = PlayFabMultiplayerAgentAPI.GetGameServerConnectionInfo();
+        if( connectionInfo != null )
+        {
+            // Set the server to the first available port
+            foreach( var port in connectionInfo.GamePortsConfiguration )
+            {
+                endpoint.Port = (ushort)port.ServerListeningPort;
+                break;
+            }
+        }
+        if( networkDriver.Bind( endpoint ) != 0 )
+        {
+            Debug.Log( "Failed to bind to port " + endpoint.Port );
+        }
+        else
+        {
+            networkDriver.Listen();
+        }
+
+        connections = new NativeList<NetworkConnection>( 16, Allocator.Persistent );
+
+        enemyStatus = new byte[ numEnemies ];
+        for( int i = 0; i < numEnemies; i++ )
+        {
+            enemyStatus[ i ] = 1;
+        }
+        Debug.Log( "Server Started From Agent Activation" );
+    }
+
     void Start()
     {
         if( RunLocal )
 		{
-            OnServerActive(); // Run the server locally
+            StartServer(); // Run the server locally
 		}
         else
 		{
@@ -201,15 +192,5 @@ public class Server : MonoBehaviour
             }
             networkDriver.EndSend( writer );
         }
-
-		//Debug.Log( Time.realtimeSinceStartup );
-		//if( Time.realtimeSinceStartup > 10 )
-		//{
-		//	for( var i = 0; i < enemyStatus.Length; i++ )
-		//	{
-		//		Debug.Log( "killing " + i );
-  //              enemyStatus[ i ] = 0;
-  //          }
-		//}
 	}
 }

@@ -201,16 +201,5 @@ public class Client : MonoBehaviour
             }
             networkDriver.EndSend( writer );
         }
-
-  //      Debug.Log( Time.realtimeSinceStartup );
-  //      if( Time.realtimeSinceStartup > 10 )
-		//{
-  //          for( var i = 0; i < enemyManager.Enemies.Count; i++ )
-  //          {
-  //              Debug.Log( "killing " + i );
-  //              enemyManager.Enemies[ i ].m_Health.Kill();
-  //              //GameObject.Destroy( enemies[ i ] );
-  //          }
-  //      }
     }
 }
